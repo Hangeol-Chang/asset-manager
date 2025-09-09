@@ -9,18 +9,17 @@ import sys
 import json
 import logging
 from datetime import datetime, timedelta
-from flask import Blueprint, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template
 
 # 현재 모듈의 경로를 Python path에 추가
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
 
-# Blueprint 생성 - 템플릿과 static 폴더 설정
-sub_app = Blueprint('asset_manager', __name__,
-                    url_prefix='/asset-manager',
-                    template_folder=os.path.join(current_dir, 'web', 'templates'),
-                    static_folder=os.path.join(current_dir, 'web', 'static'),
-                    static_url_path='/static')
+# Flask 서브 앱 생성 - 템플릿과 static 폴더 설정
+sub_app = Flask(__name__, 
+                template_folder=os.path.join(current_dir, 'web', 'templates'),
+                static_folder=os.path.join(current_dir, 'web', 'static'),
+                static_url_path='/asset-manager/static')
 
 # 로깅 설정
 logger = logging.getLogger('asset-manager')

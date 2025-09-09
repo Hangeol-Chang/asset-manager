@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>거래 내역 - Asset Manager</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('asset_manager.static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="transactions-header">
+            <h1>📊 거래 내역</h1>
+            <a href="/asset-manager/" class="back-btn">← 대시보드로</a>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card income">
+                <h4>총 수입</h4>
+                <div class="value" style="color: #27ae60;">+₩{{ "{:,}".format(total_income) }}</div>
+            </div>
+            <div class="stat-card expense">
+                <h4>총 지출</h4>
+                <div class="value" style="color: #e74c3c;">-₩{{ "{:,}".format(total_expense) }}</div>
+            </div>
+            <div class="stat-card net">
+                <h4>순 수지</h4>
+                <div class="value" style="color: {{ '#27ae60' if net_amount >= 0 else '#e74c3c' }};">
+                    {{ '+' if net_amount >= 0 else '' }}₩{{ "{:,}".format(net_amount) }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <h3>🔍 필터</h3>
+            <form method="GET">
+                <div class="filter-row">
+                    <div class="form-group">
+                        <label>시작 날짜</label>
+                        <input type="date" name="start_date" value="{{ request.args.get('start_date', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label>종료 날짜</label>
+                        <input type="date" name="end_date" value="{{ request.args.get('end_date', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label>카테고리</label>
+                        <select name="category">
+                            <option value="">전체 카테고리</option>
+                            {% for cat in categories.income + categories.expense %}
+                            <option value="{{ cat }}" {{ 'selected' if request.args.get('category') == cat else '' }}>{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>타입</label>
+                        <select name="type">
+                            <option value="">수입/지출 전체</option>
+                            <option value="income" {{ 'selected' if request.args.get('type') == 'income' else '' }}>수입만</option>
+                            <option value="expense" {{ 'selected' if request.args.get('type') == 'expense' else '' }}>지출만</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn">필터 적용</button>
+                        <a href="/asset-manager/transactions" class="btn btn-secondary">초기화</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="transactions-list">
+            {% if filtered_transactions %}
+                {% for transaction in filtered_transactions %}
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-desc">{{ transaction.description }}</div>
+                        <div class="transaction-meta">
+                            <span>📅 {{ transaction.date }}</span>
+                            <span class="category-badge">{{ transaction.category }}</span>
+                            <span>🕒 {{ transaction.created_at[:16] if transaction.created_at else '' }}</span>
+                        </div>
+                    </div>
+                    <div class="transaction-amount {{ transaction.type }}">
+                        {{ '+' if transaction.type == 'income' else '-' }}₩{{ "{:,}".format(transaction.amount) }}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="icon">📊</div>
+                    <h3>거래 내역이 없습니다</h3>
+                    <p>조건에 맞는 거래 내역이 없습니다.<br>다른 조건으로 검색해보세요.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if filtered_transactions|length > 0 %}
+        <div style="text-align: center; margin-top: 30px; color: #7f8c8d;">
+            총 {{ filtered_transactions|length }}건의 거래 내역
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

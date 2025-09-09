@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Asset Manager - 자산 관리</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('asset_manager.static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 나의 자산 관리</h1>
+            <p>{{ current_date }}</p>
+        </div>
+        
+        <!-- 자산 현황 요약 -->
+        <div class="asset-summary">
+            <h2>총 자산</h2>
+            <div class="total-assets">₩{{ "{:,}".format(total_assets) }}</div>
+            <div class="monthly-summary">
+                <div class="monthly-item">
+                    <h4>이번 달 수입</h4>
+                    <div class="amount">₩{{ "{:,}".format(monthly_income) }}</div>
+                </div>
+                <div class="monthly-item">
+                    <h4>이번 달 지출</h4>
+                    <div class="amount">₩{{ "{:,}".format(monthly_expense) }}</div>
+                </div>
+                <div class="monthly-item">
+                    <h4>이번 달 수지</h4>
+                    <div class="amount" style="color: {% if monthly_balance >= 0 %}lightgreen{% else %}lightcoral{% endif %}">
+                        ₩{{ "{:,}".format(monthly_balance) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 빠른 액션 버튼들 -->
+        <div class="quick-actions">
+            <a href="#" class="action-btn" onclick="showAddTransaction('expense')">
+                <div class="icon">💸</div>
+                <div class="title">지출 등록</div>
+                <div class="desc">새로운 지출 내역 추가</div>
+            </a>
+            <a href="#" class="action-btn" onclick="showAddTransaction('income')">
+                <div class="icon">💰</div>
+                <div class="title">수입 등록</div>
+                <div class="desc">새로운 수입 내역 추가</div>
+            </a>
+            <a href="/asset-manager/assets" class="action-btn">
+                <div class="icon">🏦</div>
+                <div class="title">자산 현황</div>
+                <div class="desc">계좌별 잔액 확인</div>
+            </a>
+            <a href="/asset-manager/analysis" class="action-btn">
+                <div class="icon">📊</div>
+                <div class="title">지출 분석</div>
+                <div class="desc">소비 패턴 분석</div>
+            </a>
+        </div>
+        
+        <!-- 거래 내역 추가 폼 -->
+        <div id="transaction-form" class="form-container">
+            <h3 id="form-title">거래 내역 추가</h3>
+            <form id="add-transaction-form">
+                <div class="form-group">
+                    <label for="amount">금액 (원)</label>
+                    <input type="number" id="amount" name="amount" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">카테고리</label>
+                    <select id="category" name="category" required>
+                        <!-- 카테고리는 JavaScript로 동적 로드 -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">내용</label>
+                    <input type="text" id="description" name="description" required placeholder="예: 점심식사, 급여 등">
+                </div>
+                <div class="form-group">
+                    <label for="date">날짜</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <input type="hidden" id="type" name="type">
+                <button type="submit" class="btn">등록</button>
+                <button type="button" class="btn btn-secondary" onclick="hideForm()">취소</button>
+            </form>
+        </div>
+        
+        <!-- 최근 거래 내역 -->
+        <div class="recent-transactions">
+            <h3>📋 최근 거래 내역</h3>
+            {% if recent_transactions %}
+                {% for transaction in recent_transactions %}
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-desc">{{ transaction.description }}</div>
+                        <div class="transaction-meta">{{ transaction.date }} • {{ transaction.category }}</div>
+                    </div>
+                    <div class="transaction-amount {{ transaction.type }}">
+                        {{ '+' if transaction.type == 'income' else '-' }}₩{{ "{:,}".format(transaction.amount) }}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="text-align: center; color: #7f8c8d; padding: 20px;">아직 거래 내역이 없습니다.</p>
+            {% endif %}
+            
+            {% if recent_transactions|length >= 5 %}
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="/asset-manager/transactions" class="btn">전체 거래 내역 보기</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script src="{{ url_for('asset_manager.static', filename='js/dashboard.js') }}"></script>
+    <script>
+        // 카테고리 데이터 전달
+        window.categories = {{ categories|tojson }};
+    </script>
+</body>
+</html>
