@@ -15,6 +15,9 @@ from flask import Blueprint, request, jsonify, render_template
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
 
+# 데이터베이스 모듈 import
+from database import AssetManagerDB
+
 # Blueprint 생성 - 템플릿과 static 폴더 설정
 sub_app = Blueprint('asset_manager', __name__,
                     url_prefix='/asset-manager',
@@ -25,7 +28,10 @@ sub_app = Blueprint('asset_manager', __name__,
 # 로깅 설정
 logger = logging.getLogger('asset-manager')
 
-# 데이터 파일 경로
+# 데이터베이스 인스턴스 초기화
+db = AssetManagerDB()
+
+# 데이터 파일 경로 (기존 JSON 파일들과 호환성을 위해 유지)
 DATA_DIR = os.path.join(current_dir, 'data')
 TRANSACTIONS_FILE = os.path.join(DATA_DIR, 'transactions.json')
 CATEGORIES_FILE = os.path.join(DATA_DIR, 'categories.json')
@@ -86,31 +92,45 @@ def save_json_file(filepath, data):
 # 메인 대시보드
 @sub_app.route('/')
 def dashboard():
-    """자산 관리 대시보드"""
-    # 실제 데이터 로드
-    assets = load_json_file(ASSETS_FILE)
-    transactions = load_json_file(TRANSACTIONS_FILE)
-    categories = load_json_file(CATEGORIES_FILE)
-    
-    # 총 자산 계산
-    total_assets = 0
-    if 'cash' in assets:
-        total_assets += assets['cash'].get('amount', 0)
-    
-    for account in assets.get('bank_accounts', []):
-        total_assets += account.get('amount', 0)
-    
-    for investment in assets.get('investments', []):
-        total_assets += investment.get('amount', 0)
-    
-    # 최근 거래 내역 (최근 5개)
-    recent_transactions = sorted(transactions, key=lambda x: x.get('created_at', ''), reverse=True)[:5]
-    
-    # 이번 달 수입/지출 계산
-    current_month = datetime.now().strftime('%Y-%m')
-    monthly_income = sum(t['amount'] for t in transactions if t['date'].startswith(current_month) and t['type'] == 'income')
-    monthly_expense = sum(t['amount'] for t in transactions if t['date'].startswith(current_month) and t['type'] == 'expense')
-    monthly_balance = monthly_income - monthly_expense
+    """자산 관리 대시보드 (SQLite 기반)"""
+    try:
+        # 현재 날짜 정보
+        now = datetime.now()
+        current_month = now.strftime('%Y-%m')
+        
+        # 월별 요약 데이터 가져오기
+        monthly_summary = db.get_monthly_summary(now.year, now.month)
+        monthly_income = monthly_summary['income']
+        monthly_expense = monthly_summary['expense']
+        monthly_balance = monthly_summary['balance']
+        
+        # 최근 거래 내역 (최근 5개)
+        recent_transactions = db.get_transactions(limit=5)
+        
+        # 총 자산 계산 (기존 JSON 파일 방식 유지)
+        assets = load_json_file(ASSETS_FILE)
+        total_assets = 0
+        if 'cash' in assets:
+            total_assets += assets['cash'].get('amount', 0)
+        
+        for account in assets.get('bank_accounts', []):
+            total_assets += account.get('amount', 0)
+        
+        for investment in assets.get('investments', []):
+            total_assets += investment.get('amount', 0)
+        
+        # 카테고리 정보 (기존 방식으로 유지 - 템플릿 호환성)
+        categories = load_json_file(CATEGORIES_FILE)
+        
+    except Exception as e:
+        logger.error(f"Dashboard data loading error: {e}")
+        # 오류 발생 시 기본값 설정
+        monthly_income = 0
+        monthly_expense = 0
+        monthly_balance = 0
+        recent_transactions = []
+        total_assets = 0
+        categories = {}
     
     return render_template('dashboard.html',
                          total_assets=total_assets,
@@ -272,6 +292,183 @@ def get_categories():
         'status': 'success',
         'categories': categories
     })
+
+# ============= 새로운 SQLite 기반 API 엔드포인트들 =============
+
+@sub_app.route('/api/transactions', methods=['POST'])
+def api_add_transaction():
+    """새로운 거래 내역 추가 (SQLite 기반)"""
+    try:
+        data = request.get_json()
+        
+        # 필수 필드 검증
+        required_fields = ['type', 'amount', 'category_id']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    'status': 'error',
+                    'message': f'필수 필드가 누락되었습니다: {field}'
+                }), 400
+        
+        # 거래 타입 검증
+        if data['type'] not in ['income', 'expense']:
+            return jsonify({
+                'status': 'error',
+                'message': '거래 타입은 income 또는 expense여야 합니다.'
+            }), 400
+        
+        # 금액 검증
+        try:
+            amount = float(data['amount'])
+            if amount <= 0:
+                return jsonify({
+                    'status': 'error',
+                    'message': '금액은 0보다 커야 합니다.'
+                }), 400
+        except (ValueError, TypeError):
+            return jsonify({
+                'status': 'error',
+                'message': '유효하지 않은 금액입니다.'
+            }), 400
+        
+        # 카테고리 ID 검증
+        try:
+            category_id = int(data['category_id'])
+        except (ValueError, TypeError):
+            return jsonify({
+                'status': 'error',
+                'message': '유효하지 않은 카테고리 ID입니다.'
+            }), 400
+        
+        # 거래 내역 추가
+        transaction_id = db.add_transaction(
+            transaction_type=data['type'],
+            amount=amount,
+            category_id=category_id,
+            description=data.get('description', ''),
+            date=data.get('date')
+        )
+        
+        return jsonify({
+            'status': 'success',
+            'message': '거래 내역이 성공적으로 추가되었습니다.',
+            'transaction_id': transaction_id
+        })
+        
+    except Exception as e:
+        logger.error(f"Error adding transaction: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': '서버 오류가 발생했습니다.'
+        }), 500
+
+@sub_app.route('/api/transactions', methods=['GET'])
+def api_get_transactions():
+    """거래 내역 조회 (SQLite 기반)"""
+    try:
+        # 쿼리 파라미터 받기
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        transaction_type = request.args.get('type')
+        category_id = request.args.get('category_id')
+        limit = request.args.get('limit', type=int)
+        
+        # 카테고리 ID 변환
+        if category_id:
+            try:
+                category_id = int(category_id)
+            except ValueError:
+                return jsonify({
+                    'status': 'error',
+                    'message': '유효하지 않은 카테고리 ID입니다.'
+                }), 400
+        
+        # 거래 내역 조회
+        transactions = db.get_transactions(
+            start_date=start_date,
+            end_date=end_date,
+            transaction_type=transaction_type,
+            category_id=category_id,
+            limit=limit
+        )
+        
+        return jsonify({
+            'status': 'success',
+            'transactions': transactions,
+            'count': len(transactions)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting transactions: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': '서버 오류가 발생했습니다.'
+        }), 500
+
+@sub_app.route('/api/categories', methods=['GET'])
+def api_get_categories():
+    """카테고리 목록 조회 (SQLite 기반)"""
+    try:
+        category_type = request.args.get('type')
+        
+        # 타입 검증
+        if category_type and category_type not in ['income', 'expense']:
+            return jsonify({
+                'status': 'error',
+                'message': '유효하지 않은 카테고리 타입입니다. (income 또는 expense)'
+            }), 400
+        
+        categories = db.get_categories(category_type=category_type)
+        
+        return jsonify({
+            'status': 'success',
+            'categories': categories
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting categories: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': '서버 오류가 발생했습니다.'
+        }), 500
+
+@sub_app.route('/api/summary/monthly', methods=['GET'])
+def api_monthly_summary():
+    """월별 수입/지출 요약 (SQLite 기반)"""
+    try:
+        # 현재 날짜 기본값
+        now = datetime.now()
+        year = request.args.get('year', default=now.year, type=int)
+        month = request.args.get('month', default=now.month, type=int)
+        
+        # 년/월 검증
+        if not (1 <= month <= 12):
+            return jsonify({
+                'status': 'error',
+                'message': '유효하지 않은 월입니다. (1-12)'
+            }), 400
+        
+        if not (1900 <= year <= 2100):
+            return jsonify({
+                'status': 'error',
+                'message': '유효하지 않은 년도입니다.'
+            }), 400
+        
+        summary = db.get_monthly_summary(year, month)
+        
+        return jsonify({
+            'status': 'success',
+            'year': year,
+            'month': month,
+            'summary': summary
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting monthly summary: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': '서버 오류가 발생했습니다.'
+        }), 500
 
 # 앱 시작 시 데이터 디렉토리 확인
 ensure_data_directory()

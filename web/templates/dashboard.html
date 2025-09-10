@@ -61,22 +61,23 @@
         </div>
         
         <!-- 거래 내역 추가 폼 -->
-        <div id="transaction-form" class="form-container">
-            <h3 id="form-title">거래 내역 추가</h3>
+                <!-- 거래 등록 폼 -->
+        <div id="transaction-form" class="form-overlay" style="display: none;">
             <form id="add-transaction-form">
+                <h3 id="form-title">거래 내역 등록</h3>
                 <div class="form-group">
-                    <label for="amount">금액 (원)</label>
-                    <input type="number" id="amount" name="amount" required>
+                    <label for="amount">금액</label>
+                    <input type="number" id="amount" name="amount" required min="1" step="0.01">
                 </div>
                 <div class="form-group">
-                    <label for="category">카테고리</label>
-                    <select id="category" name="category" required>
-                        <!-- 카테고리는 JavaScript로 동적 로드 -->
+                    <label for="category_id">카테고리</label>
+                    <select id="category_id" name="category_id" required>
+                        <option value="">카테고리를 선택하세요</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="description">내용</label>
-                    <input type="text" id="description" name="description" required placeholder="예: 점심식사, 급여 등">
+                    <label for="description">설명</label>
+                    <input type="text" id="description" name="description" placeholder="거래 내역 설명">
                 </div>
                 <div class="form-group">
                     <label for="date">날짜</label>
@@ -117,8 +118,10 @@
     
     <script src="{{ url_for('asset_manager.static', filename='js/dashboard.js') }}"></script>
     <script type="text/javascript">
-        // 카테고리 데이터 전달
-        window.categories = JSON.parse('{{ categories|tojson|safe }}');
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+        });
     </script>
 </body>
 </html>
