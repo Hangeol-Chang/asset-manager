@@ -4,6 +4,7 @@
     <title>Asset Manager - 자산 관리</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <link rel="stylesheet" href="{{ url_for('asset_manager.static', filename='css/style.css') }}">
 </head>
 <body>
@@ -28,7 +29,7 @@
                 </div>
                 <div class="monthly-item">
                     <h4>이번 달 수지</h4>
-                    <div class="amount" style="color: {% if monthly_balance >= 0 %}lightgreen{% else %}lightcoral{% endif %}">
+                    <div class="amount {{ 'positive' if monthly_balance >= 0 else 'negative' }}">
                         ₩{{ "{:,}".format(monthly_balance) }}
                     </div>
                 </div>
@@ -115,9 +116,9 @@
     </div>
     
     <script src="{{ url_for('asset_manager.static', filename='js/dashboard.js') }}"></script>
-    <script>
+    <script type="text/javascript">
         // 카테고리 데이터 전달
-        window.categories = {{ categories|tojson }};
+        window.categories = JSON.parse('{{ categories|tojson|safe }}');
     </script>
 </body>
 </html>

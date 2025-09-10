@@ -441,3 +441,12 @@ body {
     font-size: 0.8em;
     display: inline-block;
 }
+
+/* 금액 색상 클래스 */
+.value.positive {
+    color: #27ae60;
+}
+
+.value.negative {
+    color: #e74c3c;
+}
