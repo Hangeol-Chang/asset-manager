@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>자산 현황 - Asset Manager</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('asset_manager.static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏦 자산 현황</h1>
+            <a href="/asset-manager/" class="back-btn">← 대시보드로</a>
+        </div>
+        
+        <div class="total-summary">
+            <h2>총 자산</h2>
+            <div class="total-amount">₩{{ "{:,}".format(total_assets) }}</div>
+            <p>모든 계좌 및 투자자산 합계</p>
+        </div>
+        
+        <div class="asset-grid">
+            <!-- 현금 -->
+            <div class="asset-category">
+                <h3>💵 현금</h3>
+                <div class="asset-item">
+                    <div class="asset-info">
+                        <div class="asset-name">{{ assets.cash.name if assets.cash else '현금' }}</div>
+                        <div class="asset-type">즉시 사용 가능한 현금</div>
+                    </div>
+                    <div class="asset-amount">₩{{ "{:,}".format(assets.cash.amount if assets.cash else 0) }}</div>
+                </div>
+                <button class="btn" onclick="updateCash()" style="width: 100%; margin-top: 15px;">수정</button>
+            </div>
+            
+            <!-- 은행 계좌 -->
+            <div class="asset-category">
+                <h3>🏦 은행 계좌</h3>
+                {% if assets.bank_accounts %}
+                    {% for account in assets.bank_accounts %}
+                    <div class="asset-item">
+                        <div class="asset-info">
+                            <div class="asset-name">{{ account.name }}</div>
+                            <div class="asset-type">{{ account.get('account_number', '계좌번호 미등록') }}</div>
+                        </div>
+                        <div class="asset-amount">₩{{ "{:,}".format(account.amount) }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>등록된 은행 계좌가 없습니다.</p>
+                    </div>
+                {% endif %}
+                <button class="btn" onclick="addBankAccount()" style="width: 100%; margin-top: 15px;">계좌 추가</button>
+            </div>
+            
+            <!-- 투자 자산 -->
+            <div class="asset-category">
+                <h3>📈 투자 자산</h3>
+                {% if assets.investments %}
+                    {% for investment in assets.investments %}
+                    <div class="asset-item">
+                        <div class="asset-info">
+                            <div class="asset-name">{{ investment.name }}</div>
+                            <div class="asset-type">{{ investment.get('quantity', 0) }}주 @ ₩{{ "{:,}".format(investment.get('current_price', 0)) }}</div>
+                        </div>
+                        <div class="asset-amount">₩{{ "{:,}".format(investment.amount) }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>등록된 투자 자산이 없습니다.</p>
+                    </div>
+                {% endif %}
+                <button class="btn" onclick="addInvestment()" style="width: 100%; margin-top: 15px;">투자 추가</button>
+            </div>
+        </div>
+        
+        <!-- 기타 자산 -->
+        {% if assets.real_estate or assets.other %}
+        <div class="asset-category" style="margin-top: 30px;">
+            <h3>🏠 기타 자산</h3>
+            {% for asset in assets.real_estate %}
+                <div class="asset-item">
+                    <div class="asset-info">
+                        <div class="asset-name">{{ asset.name }}</div>
+                        <div class="asset-type">부동산</div>
+                    </div>
+                    <div class="asset-amount">₩{{ "{:,}".format(asset.amount) }}</div>
+                </div>
+            {% endfor %}
+            {% for asset in assets.other %}
+                <div class="asset-item">
+                    <div class="asset-info">
+                        <div class="asset-name">{{ asset.name }}</div>
+                        <div class="asset-type">{{ asset.get('type', '기타') }}</div>
+                    </div>
+                    <div class="asset-amount">₩{{ "{:,}".format(asset.amount) }}</div>
+                </div>
+            {% endfor %}
+            <button class="btn" onclick="addOtherAsset()" style="width: 100%; margin-top: 15px;">자산 추가</button>
+        </div>
+        {% endif %}
+    </div>
+    
+    <script src="{{ url_for('asset_manager.static', filename='js/assets.js') }}"></script>
+</body>
+</html>

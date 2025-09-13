@@ -1,0 +1,11 @@
+{
+  "cash": {
+    "name": "현금",
+    "amount": 0,
+    "currency": "KRW"
+  },
+  "bank_accounts": [],
+  "investments": [],
+  "real_estate": [],
+  "other": []
+}

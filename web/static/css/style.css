@@ -1,0 +1,452 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.container {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.header h1 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 2.5em;
+    font-weight: 300;
+}
+
+.header p {
+    color: #7f8c8d;
+    margin: 10px 0 0 0;
+    font-size: 1.1em;
+}
+
+/* 자산 현황 카드 */
+.asset-summary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.total-assets {
+    font-size: 3em;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.monthly-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.monthly-item {
+    background: rgba(255,255,255,0.2);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.monthly-item h4 {
+    margin: 0 0 10px 0;
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.monthly-item .amount {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* 빠른 액션 버튼 */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.action-btn {
+    background: white;
+    border: 2px solid #ecf0f1;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: #2c3e50;
+}
+
+.action-btn:hover {
+    border-color: #667eea;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    text-decoration: none;
+    color: #667eea;
+}
+
+.action-btn .icon {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.action-btn .title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.action-btn .desc {
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+/* 최근 거래 내역 */
+.recent-transactions {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.recent-transactions h3 {
+    margin: 0 0 20px 0;
+    color: #2c3e50;
+    font-size: 1.3em;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-info {
+    flex: 1;
+}
+
+.transaction-desc {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.transaction-meta {
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+.transaction-amount {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.income {
+    color: #27ae60;
+}
+
+.expense {
+    color: #e74c3c;
+}
+
+/* 폼 스타일 */
+.form-container {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 15px;
+    margin-top: 20px;
+    display: none;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.btn {
+    background: #667eea;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn:hover {
+    background: #5a6fd8;
+}
+
+.btn-secondary {
+    background: #95a5a6;
+    margin-left: 10px;
+}
+
+.btn-secondary:hover {
+    background: #7f8c8d;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .monthly-summary {
+        grid-template-columns: 1fr;
+    }
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .total-assets {
+        font-size: 2em;
+    }
+}
+
+/* 자산 페이지 스타일 */
+.asset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.asset-category {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-left: 5px solid #667eea;
+}
+
+.asset-category h3 {
+    margin: 0 0 20px 0;
+    color: #2c3e50;
+    font-size: 1.4em;
+}
+
+.asset-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.asset-item:last-child {
+    border-bottom: none;
+}
+
+.asset-info {
+    flex: 1;
+}
+
+.asset-name {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 3px;
+}
+
+.asset-type {
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+.asset-amount {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #27ae60;
+}
+
+/* 거래 내역 페이지 스타일 */
+.transactions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.filters {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    align-items: end;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.stat-card h4 {
+    margin: 0 0 10px 0;
+    color: #7f8c8d;
+    font-size: 0.9em;
+    text-transform: uppercase;
+}
+
+.stat-card .value {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.transactions-list {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #7f8c8d;
+}
+
+.empty-state .icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    gap: 10px;
+}
+
+.pagination button {
+    padding: 8px 16px;
+    border: 2px solid #ecf0f1;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination .current-page {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+/* 자산 페이지 추가 스타일 */
+.total-summary {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.total-amount {
+    font-size: 3em;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.back-btn {
+    background: #95a5a6;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.back-btn:hover {
+    background: #7f8c8d;
+    text-decoration: none;
+    color: white;
+}
+
+/* 거래 내역 페이지 추가 스타일 */
+.category-badge {
+    background: #667eea;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    display: inline-block;
+}
+
+/* 금액 색상 클래스 */
+.value.positive {
+    color: #27ae60;
+}
+
+.value.negative {
+    color: #e74c3c;
+}
