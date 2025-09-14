@@ -1,0 +1,20 @@
+# Asset Manager Module Dependencies
+
+# Flask Web Framework (shared with main server)
+flask==3.1.2
+requests==2.32.5
+
+# Database and Data Handling
+# sqlite3 is included in Python standard library
+
+# Date and Time handling
+# datetime is included in Python standard library
+
+# Type hints support
+# typing is included in Python standard library (Python 3.5+)
+
+# JSON handling
+# json is included in Python standard library
+
+# Standard Libraries (already included in Python)
+# os, logging, pathlib, sqlite3, datetime, typing, json
