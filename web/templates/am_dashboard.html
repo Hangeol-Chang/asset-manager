@@ -1,18 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Asset Manager - 자산 관리</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
-    <link rel="stylesheet" href="{{ url_for('asset_manager.static', filename='css/style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>💰 나의 자산 관리</h1>
-            <p>{{ current_date }}</p>
-        </div>
+{% extends "base.html" %}
+
+{% block title %}Asset Manager - 자산 관리{% endblock %}
+
+{% block header_title %}💰 자산 관리{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('asset_manager.static', filename='css/style.css') }}">
+{% endblock %}
+
+{% block content %}
         
         <!-- 자산 현황 요약 -->
         <div class="asset-summary">
@@ -114,14 +110,15 @@
             </div>
             {% endif %}
         </div>
-    </div>
     
-    <script src="{{ url_for('asset_manager.static', filename='js/dashboard.js') }}"></script>
-    <script type="text/javascript">
-        // 페이지 로드 시 초기화
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeDashboard();
-        });
-    </script>
-</body>
-</html>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('asset_manager.static', filename='js/dashboard.js') }}"></script>
+<script type="text/javascript">
+    // 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeDashboard();
+    });
+</script>
+{% endblock %}

@@ -18,7 +18,7 @@ sys.path.insert(0, current_dir)
 # 데이터베이스 모듈 import
 from database import AssetManagerDB
 
-# Blueprint 생성 - 템플릿과 static 폴더 설정
+# Blueprint 생성 - 자체 템플릿 폴더 사용
 sub_app = Blueprint('asset_manager', __name__,
                     url_prefix='/asset-manager',
                     template_folder=os.path.join(current_dir, 'web', 'templates'),
@@ -132,7 +132,7 @@ def dashboard():
         total_assets = 0
         categories = {}
     
-    return render_template('dashboard.html',
+    return render_template('am_dashboard.html',
                          total_assets=total_assets,
                          monthly_income=monthly_income,
                          monthly_expense=monthly_expense,
@@ -187,7 +187,7 @@ def get_transactions():
     total_expense = sum(t['amount'] for t in filtered_transactions if t['type'] == 'expense')
     net_amount = total_income - total_expense
     
-    return render_template('transactions.html',
+    return render_template('am_transactions.html',
                          filtered_transactions=filtered_transactions,
                          categories=categories,
                          total_income=total_income,
@@ -260,7 +260,7 @@ def get_assets():
         })
     
     # 웹 페이지 요청인 경우 HTML 응답
-    return render_template('assets.html',
+    return render_template('am_assets.html',
                          assets=assets,
                          total_assets=total_assets)
 

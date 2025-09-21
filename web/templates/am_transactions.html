@@ -1,18 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>거래 내역 - Asset Manager</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
-    <link rel="stylesheet" href="{{ url_for('asset_manager.static', filename='css/style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <div class="transactions-header">
-            <h1>📊 거래 내역</h1>
-            <a href="/asset-manager/" class="back-btn">← 대시보드로</a>
-        </div>
+{% extends "base.html" %}
+
+{% block title %}거래 내역 - Asset Manager{% endblock %}
+
+{% block header_title %}📊 거래 내역{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('asset_manager.static', filename='css/style.css') }}">
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="/asset-manager/" class="back-btn" style="display: inline-block; padding: 8px 16px; background: #667eea; color: white; text-decoration: none; border-radius: 4px;">← 대시보드로</a>
+</div>
         
         <div class="stats-grid">
             <div class="stat-card income">
@@ -99,6 +98,5 @@
             총 {{ filtered_transactions|length }}건의 거래 내역
         </div>
         {% endif %}
-    </div>
-</body>
-</html>
+
+{% endblock %}
